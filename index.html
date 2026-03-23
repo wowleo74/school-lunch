@@ -1,269 +1,494 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>학교알리미</title>
-
-    <link rel="manifest" href="manifest.json">
+    <title>학교알리미 v2.3</title>
     <style>
         :root {
-            /* 아이별 색상 정의 */
-            --sieun-color: #FF85A1;   /* 시은 핑크 */
-            --gaeun-color: #4AA3FF;   /* 가은 하늘 */
-            --current-theme: #4F6FD6; /* 기본값 */
+            --sieun-color: #FF85A1;
+            --gaeun-color: #4AA3FF;
+            --current-theme: #4F6FD6;
             --bg-color: #f0f3f8;
         }
 
-        body { font-family: 'Malgun Gothic', sans-serif; background: var(--bg-color); margin: 0; padding: 0; transition: background 0.3s; }
-
-        /* 상단 헤더: 테마색 적용 */
-        .header-section { position: sticky; top: 0; z-index: 100; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .main-title { 
-            background: var(--current-theme); color: white; padding: 15px; 
-            text-align: center; font-size: 1.1rem; font-weight: bold; transition: background 0.3s ease; 
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s;
         }
 
-        /* 아이 선택 탭 */
-        .child-tabs { display: flex; background: white; }
-        .child-tab { flex: 1; padding: 15px; text-align: center; font-weight: bold; cursor: pointer; color: #bbb; border-bottom: 4px solid transparent; transition: 0.3s; }
-        .child-tab.active.sieun { color: var(--sieun-color); border-bottom-color: var(--sieun-color); }
-        .child-tab.active.gaeun { color: var(--gaeun-color); border-bottom-color: var(--gaeun-color); }
+        .header-section {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-        /* 메뉴 버튼 */
-        .menu-tabs { display: flex; gap: 8px; padding: 12px; background: white; }
+        .main-title {
+            background: var(--current-theme);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .settings-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .child-tabs {
+            display: flex;
+            background: white;
+        }
+
+        .child-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            color: #bbb;
+            border-bottom: 4px solid transparent;
+        }
+
+        .child-tab.active.sieun {
+            color: var(--sieun-color);
+            border-bottom-color: var(--sieun-color);
+        }
+
+        .child-tab.active.gaeun {
+            color: var(--gaeun-color);
+            border-bottom-color: var(--gaeun-color);
+        }
+
+        .menu-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+        }
+
         .menu-btn {
-            flex: 1; padding: 10px; border: 1.5px solid var(--current-theme); border-radius: 10px;
-            background: white; color: var(--current-theme); font-weight: bold; cursor: pointer; transition: all 0.2s;
+            flex: 1;
+            padding: 10px;
+            border: 1.5px solid var(--current-theme);
+            border-radius: 10px;
+            background: white;
+            color: var(--current-theme);
+            font-weight: bold;
+            cursor: pointer;
         }
-        .menu-btn.active { background: var(--current-theme); color: white; }
 
-        /* 컨텐츠 영역 */
-        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
-        .info-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); min-height: 300px; }
-        .school-label { font-weight: 800; font-size: 1.15rem; margin-bottom: 20px; color: var(--current-theme); border-left: 5px solid var(--current-theme); padding-left: 12px; }
+        .menu-btn.active {
+            background: var(--current-theme);
+            color: white;
+        }
 
-        /* 급식/시간표/일정 공통 스타일 */
-        .meal-item { padding: 15px; border: 1px solid #f0f0f0; border-radius: 15px; margin-bottom: 15px; }
-        .meal-item.today { border: 2px solid #FFCC00; background: #FFFDF5; }
-        .meal-date { font-weight: bold; color: var(--current-theme); margin-bottom: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8faff; color: var(--current-theme); padding: 10px; border: 1px solid #eee; }
-        td { padding: 10px; border: 1px solid #eee; text-align: center; font-size: 0.9rem; }
-        .highlight-cell { background: rgba(79, 111, 214, 0.1); color: var(--current-theme); font-weight: bold; }
-        .month-bar { color: var(--current-theme); border-bottom: 2px solid var(--current-theme); display: inline-block; padding: 2px 10px; margin-top: 20px; font-weight: 800; }
-        .strikethrough { color: #ccc; text-decoration: line-through; }
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            min-height: 400px;
+        }
+
+        .school-label {
+            font-weight: 800;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            color: var(--current-theme);
+            border-left: 5px solid var(--current-theme);
+            padding-left: 12px;
+        }
+
+        /* 시간표 및 하교 시간표 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th {
+            background: #f8faff;
+            color: var(--current-theme);
+            padding: 10px;
+            border: 1px solid #eee;
+            font-size: 0.85rem;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .highlight-cell {
+            background: rgba(79, 111, 214, 0.1);
+            color: var(--current-theme);
+            font-weight: bold;
+        }
+
+        .summary-box {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .leave-table {
+            border: none;
+            margin-bottom: 0;
+        }
+
+        .leave-table th {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #eee;
+            color: #999;
+            padding: 5px;
+        }
+
+        .leave-table td {
+            border: none;
+            padding: 10px 5px;
+            font-weight: bold;
+            color: var(--current-theme);
+        }
+
+        .today-mark {
+            background: var(--current-theme) !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+
+        /* 학원 카드 */
+        .aca-card {
+            display: flex;
+            align-items: center;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border-left: 5px solid #e91e63;
+            text-align: left;
+        }
+
+        .weekly-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border: 1.5px solid var(--current-theme);
+            color: var(--current-theme);
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 모달 공통 */
+        #settingsOverlay,
+        #weeklyModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .strikethrough {
+            color: #ccc;
+            text-decoration: line-through;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="header-section">
-    <div id="mainTitle" class="main-title">🏠 학교알리미</div>
-    <div class="child-tabs">
-        <div id="tab1" class="child-tab active sieun" onclick="switchChild('SCHOOL1')">시은 (5-1)</div>
-        <div id="tab2" class="child-tab gaeun" onclick="switchChild('SCHOOL2')">가은 (2-4)</div>
+    <div class="header-section">
+        <div class="main-title">🏠 학교알리미 <span class="settings-btn" onclick="toggleSettings()">⚙️</span></div>
+        <div class="child-tabs">
+            <div id="tab1" class="child-tab active sieun" onclick="switchChild('SCHOOL1')">시은 (5-1)</div>
+            <div id="tab2" class="child-tab gaeun" onclick="switchChild('SCHOOL2')">가은 (2-4)</div>
+        </div>
+        <div class="menu-tabs">
+            <button class="menu-btn active" id="btnMeal" onclick="loadContent('meal')">🍱 급식</button>
+            <button class="menu-btn" id="btnTime" onclick="loadContent('time')">📚 시간표</button>
+            <button class="menu-btn" id="btnSched" onclick="loadContent('sched')">🗓️ 일정</button>
+        </div>
     </div>
-    <div class="menu-tabs">
-        <button class="menu-btn active" id="btnMeal" onclick="loadContent('meal')">🍱 급식</button>
-        <button class="menu-btn" id="btnTime" onclick="loadContent('time')">📚 시간표</button>
-        <button class="menu-btn" id="btnSched" onclick="loadContent('sched')">🗓️ 일정</button>
+
+    <div class="container">
+        <div class="info-card">
+            <div id="schoolTitle" class="school-label">로딩 중...</div>
+            <div id="displayArea">데이터를 불러오는 중입니다.</div>
+        </div>
     </div>
-</div>
 
-<div class="container">
-    <div class="info-card">
-        <div id="schoolTitle" class="school-label">로딩 중...</div>
-        <div id="displayArea">데이터를 불러오는 중입니다.</div>
+    <div id="settingsOverlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0">학년/반 설정</h3>
+            <div style="margin-bottom:15px"><label>시은 학년-반</label>
+                <div style="display:flex;gap:5px;margin-top:5px"><input type="number" id="s_g"
+                        style="width:100%;padding:8px">학년<input type="number" id="s_c" style="width:100%;padding:8px">반
+                </div>
+            </div>
+            <div style="margin-bottom:15px"><label>가은 학년-반</label>
+                <div style="display:flex;gap:5px;margin-top:5px"><input type="number" id="g_g"
+                        style="width:100%;padding:8px">학년<input type="number" id="g_c" style="width:100%;padding:8px">반
+                </div>
+            </div>
+            <button onclick="saveSettings()"
+                style="width:100%;padding:12px;background:var(--current-theme);color:white;border:none;border-radius:10px;font-weight:bold;cursor:pointer">저장하기</button>
+            <button onclick="toggleSettings()"
+                style="width:100%;padding:10px;background:#eee;border:none;border-radius:10px;margin-top:8px;cursor:pointer">닫기</button>
+        </div>
     </div>
-</div>
 
-<script>
-// Workers 서버 주소
-const WORKER_URL = "https://leo-api.leo4240.workers.dev";
+    <div id="weeklyModal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--current-theme);">📅 주간 학원표</h3>
+            <div id="weeklyList"></div>
+            <button onclick="closeWeeklyModal()"
+                style="width:100%; padding:12px; background:#eee; border:none; border-radius:10px; margin-top:10px; cursor:pointer">닫기</button>
+        </div>
+    </div>
 
-const SCHOOLS = {
-    SCHOOL1: { name: "풍덕초등학교", child: "시은", code: "7751120", type: "elsTimetable", grade: 5, class: 1, color: "#FF85A1" },
-    SCHOOL2: { name: "신봉중학교", child: "가은", code: "7751314", type: "misTimetable", grade: 2, class: 4, color: "#4AA3FF" }
-};
+    <script>
+        const KEY = "1332ce81ab09472397f131c54c4aedbe";
+        const EDU = "J10";
+        let SCHOOLS = {
+            SCHOOL1: { name: "풍덕초등학교", child: "시은", code: "7751120", type: "elsTimetable", grade: 5, class: 1, color: "#FF85A1" },
+            SCHOOL2: { name: "신봉중학교", child: "가은", code: "7751314", type: "misTimetable", grade: 2, class: 4, color: "#4AA3FF" }
+        };
 
-let currentChild = 'SCHOOL1';
-let currentMenu = 'meal';
+        // 이미지에 기반한 시은이 학원 정보
+        const ACADEMIES = {
+            1: [{ n: "파인만", b: "3:40", t: "4:00~7:00" }],
+            2: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "닥터정", b: "4:48", t: "5:00~7:00" }],
+            3: [{ n: "태권도", b: "1:40", t: "2:10~3:00" }, { n: "파인만", b: "3:40", t: "4:00~7:00" }],
+            4: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "닥터정", b: "4:48", t: "5:00~7:00" }],
+            5: [{ n: "파인만", b: "3:40", t: "4:00~7:00" }]
+        };
 
-function switchChild(childId) {
-    currentChild = childId;
-    const sch = SCHOOLS[childId];
-    document.documentElement.style.setProperty('--current-theme', sch.color);
-    document.getElementById('tab1').classList.toggle('active', childId === 'SCHOOL1');
-    document.getElementById('tab2').classList.toggle('active', childId === 'SCHOOL2');
-    loadContent(currentMenu);
-}
+        let currentChild = 'SCHOOL1', currentMenu = 'meal';
 
-function loadContent(menu) {
-    currentMenu = menu;
-    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(menu === 'meal' ? 'btnMeal' : menu === 'time' ? 'btnTime' : 'btnSched').classList.add('active');
-    const sch = SCHOOLS[currentChild];
-    document.getElementById('schoolTitle').innerText = `${sch.name} (${sch.child} ${sch.grade}-${sch.class})`;
-    if(menu === 'meal') getMeal(sch);
-    else if(menu === 'time') getTime(sch);
-    else if(menu === 'sched') getSched(sch);
-}
+        function init() {
+            const saved = localStorage.getItem('school_v2_3');
+            if (saved) {
+                const p = JSON.parse(saved);
+                SCHOOLS.SCHOOL1.grade = p.s_g; SCHOOLS.SCHOOL1.class = p.s_c;
+                SCHOOLS.SCHOOL2.grade = p.g_g; SCHOOLS.SCHOOL2.class = p.g_c;
+            }
+            updateTabLabels();
+            switchChild('SCHOOL1');
+        }
 
-function formatDate(d) { return d.getFullYear() + (d.getMonth() + 1).toString().padStart(2, "0") + d.getDate().toString().padStart(2, "0"); }
-function displayDate(date) {
-    let y = date.substring(0, 4), m = date.substring(4, 6), d = date.substring(6, 8);
-    let day = new Date(y, m - 1, d).getDay();
-    return `${m}.${d}(${["일", "월", "화", "수", "목", "금", "토"][day]})`;
-}
+        function updateTabLabels() {
+            document.getElementById('tab1').innerText = `시은 (${SCHOOLS.SCHOOL1.grade}-${SCHOOLS.SCHOOL1.class})`;
+            document.getElementById('tab2').innerText = `가은 (${SCHOOLS.SCHOOL2.grade}-${SCHOOLS.SCHOOL2.class})`;
+        }
 
-// 공통 fetch 함수
-async function fetchFromWorker(path, params) {
-    const url = new URL(`${WORKER_URL}${path}`);
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    const res = await fetch(url);
-    return await res.json();
-}
+        function toggleSettings() {
+            const o = document.getElementById('settingsOverlay');
+            o.style.display = (o.style.display === 'flex') ? 'none' : 'flex';
+            if (o.style.display === 'flex') {
+                document.getElementById('s_g').value = SCHOOLS.SCHOOL1.grade;
+                document.getElementById('s_c').value = SCHOOLS.SCHOOL1.class;
+                document.getElementById('g_g').value = SCHOOLS.SCHOOL2.grade;
+                document.getElementById('g_c').value = SCHOOLS.SCHOOL2.class;
+            }
+        }
 
-async function getMeal(sch) {
-    let d = new Date();
-    let mon = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)));
-    let fri = new Date(mon); fri.setDate(mon.getDate() + 4);
-    try {
-        const data = await fetchFromWorker("/meal", {
-            code: sch.code,
-            from: formatDate(mon),
-            to: formatDate(fri)
-        });
-        let html = ""; let today = formatDate(new Date());
-        data.mealServiceDietInfo[1].row.forEach(r => {
-            let isToday = r.MLSV_YMD === today;
-            let cleanMenu = r.DDISH_NM.replace(/<br\/>/g, "<br>").replace(/p/g, "").replace(/\([0-9\.]+\)/g, "").trim();
-            html += `<div class="meal-item ${isToday ? 'today' : ''}">
-                <div class="meal-date">${displayDate(r.MLSV_YMD)} ${isToday ? '<span style="background:#FFCC00; color:#333; font-size:11px; padding:2px 5px; border-radius:4px;">오늘</span>' : ''}</div>
-                <div style="line-height:1.8;">${cleanMenu}</div>
+        function saveSettings() {
+            const data = { s_g: document.getElementById('s_g').value, s_c: document.getElementById('s_c').value, g_g: document.getElementById('g_g').value, g_c: document.getElementById('g_c').value };
+            localStorage.setItem('school_v2_3', JSON.stringify(data));
+            location.reload();
+        }
+
+        function switchChild(id) {
+            currentChild = id;
+            document.documentElement.style.setProperty('--current-theme', SCHOOLS[id].color);
+            document.getElementById('tab1').classList.toggle('active', id === 'SCHOOL1');
+            document.getElementById('tab2').classList.toggle('active', id === 'SCHOOL2');
+            loadContent(currentMenu);
+        }
+
+        function loadContent(menu) {
+            currentMenu = menu;
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(menu === 'meal' ? 'btnMeal' : menu === 'time' ? 'btnTime' : 'btnSched').classList.add('active');
+            const sch = SCHOOLS[currentChild];
+            document.getElementById('schoolTitle').innerText = `${sch.name} (${sch.child} ${sch.grade}-${sch.class})`;
+            if (menu === 'meal') getMeal(sch);
+            else if (menu === 'time') getTime(sch);
+            else if (menu === 'sched') getSched(sch);
+        }
+
+        async function getMeal(sch) {
+            let d = new Date(), today = formatDate(d);
+            let mon = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)));
+            let fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+            try {
+                let res = await fetch(`https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${KEY}&Type=json&ATPT_OFCDC_SC_CODE=${EDU}&SD_SCHUL_CODE=${sch.code}&MLSV_FROM_YMD=${formatDate(mon)}&MLSV_TO_YMD=${formatDate(fri)}`);
+                let data = await res.json();
+                let html = "";
+                data.mealServiceDietInfo[1].row.forEach(r => {
+                    let isToday = r.MLSV_YMD === today;
+                    let cleanMenu = r.DDISH_NM.replace(/<br\/>/g, "<br>").replace(/\([0-9\.]+\)/g, "").trim();
+                    html += `<div class="meal-item" style="padding:15px; border:1px solid #f0f0f0; border-radius:15px; margin-bottom:15px; text-align:left; ${isToday ? 'border:2px solid #FFCC00;background:#FFFDF5' : ''}">
+                <div style="font-weight:bold; color:var(--current-theme); margin-bottom:8px;">${displayDate(r.MLSV_YMD)} ${isToday ? '<span style="background:#FFCC00;padding:2px 5px;border-radius:4px;font-size:11px;color:#333">오늘</span>' : ''}</div>
+                <div style="line-height:1.7">${cleanMenu}</div>
             </div>`;
-        });
-        document.getElementById('displayArea').innerHTML = html;
-    } catch { document.getElementById('displayArea').innerText = "급식 정보가 없습니다."; }
-}
-
-async function getTime(sch) {
-    try {
-        const data = await fetchFromWorker("/time", {
-            type: sch.type,
-            code: sch.code,
-            grade: sch.grade,
-            class: sch.class
-        });
-        let rows = data[sch.type][1].row;
-        let todayDay = new Date().getDay();
-        let table = {};
-
-        rows.forEach(r => {
-            let d = new Date(r.ALL_TI_YMD.substring(0,4), r.ALL_TI_YMD.substring(4,6)-1, r.ALL_TI_YMD.substring(6,8)).getDay();
-            if(!table[r.PERIO]) table[r.PERIO] = {};
-            table[r.PERIO][d] = r.ITRT_CNTNT;
-        });
-
-        let html = "<table><tr><th></th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>";
-        for(let p=1; p<=7; p++) {
-            html += `<tr><td style="background:#f8f9ff;font-weight:bold">${p}</td>`;
-            for(let d=1; d<=5; d++) html += `<td class="${d===todayDay?'highlight-cell':''}">${table[p]?.[d]||""}</td>`;
-            html += "</tr>";
-        }
-        html += "</table>";
-
-        const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-        let leaveTimes = {};
-        for (let d = 1; d <= 5; d++) {
-            let dMax = 0;
-            for (let p = 1; p <= 7; p++) { if (table[p]?.[d]) dMax = Math.max(dMax, p); }
-            if (sch.type === "elsTimetable") {
-                leaveTimes[d] = ["", "09:40", "10:30", "11:20", "12:10", "13:50", "14:40", "15:30"][dMax] || " - ";
-            } else {
-                leaveTimes[d] = ["", "09:45", "10:40", "11:35", "12:30", "14:20", "15:15", "16:10"][dMax] || " - ";
-            }
+                });
+                document.getElementById('displayArea').innerHTML = html;
+            } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
         }
 
-        html += `
-        <div style="margin-top:20px; padding:15px; background:white; border:2px solid var(--current-theme); border-radius:12px;">
-            <div style="text-align:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px dashed #ddd;">
-                <span style="font-size:1.1rem;">🏃 오늘(${dayNames[todayDay]}) 하교 시간: </span>
-                <span style="font-size:1.2rem; color:var(--current-theme); font-weight:bold;">${leaveTimes[todayDay] || "정보없음"}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#666; gap:4px;">
-                ${[1,2,3,4,5].map(d => `
-                    <div style="flex:1; text-align:center; ${d===todayDay?'padding:4px; background:rgba(79,111,214,0.1); border-radius:6px; font-weight:bold; color:var(--current-theme)':''}">
-                        ${dayNames[d]}<br>${leaveTimes[d]}
-                    </div>
-                `).join('')}
-            </div>
+        async function getTime(sch) {
+            try {
+                let res = await fetch(`https://open.neis.go.kr/hub/${sch.type}?KEY=${KEY}&Type=json&pSize=100&ATPT_OFCDC_SC_CODE=${EDU}&SD_SCHUL_CODE=${sch.code}&AY=2026&SEM=1&GRADE=${sch.grade}&CLASS_NM=${sch.class}`);
+                let data = await res.json();
+                let rows = data[sch.type][1].row;
+                let todayDay = new Date().getDay(), table = {};
+                rows.forEach(r => {
+                    let d = new Date(r.ALL_TI_YMD.substring(0, 4), r.ALL_TI_YMD.substring(4, 6) - 1, r.ALL_TI_YMD.substring(6, 8)).getDay();
+                    if (!table[r.PERIO]) table[r.PERIO] = {};
+                    table[r.PERIO][d] = r.ITRT_CNTNT;
+                });
+
+                // 시간표 출력 (초등 7교시 제외)
+                let html = "<table><tr><th></th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>";
+                let maxP = (sch.type === "elsTimetable") ? 6 : 7;
+                for (let p = 1; p <= maxP; p++) {
+                    html += `<tr><td style="background:#f8f9ff;font-weight:bold">${p}</td>`;
+                    for (let d = 1; d <= 5; d++) html += `<td class="${d === todayDay ? 'highlight-cell' : ''}">${table[p]?.[d] || ""}</td>`;
+                    html += "</tr>";
+                }
+                html += "</table>";
+
+                // 주간 하교 시간 계산
+                let weekLeaves = [];
+                for (let d = 1; d <= 5; d++) {
+                    let dMax = 0; for (let p = 1; p <= maxP; p++) { if (table[p]?.[d]) dMax = p; }
+                    let t = (sch.type === "elsTimetable") ? ["", "09:40", "10:30", "11:20", "12:10", "13:50", "14:40"][dMax] : ["", "09:45", "10:40", "11:35", "12:30", "14:20", "15:15", "16:10"][dMax];
+                    weekLeaves.push(t || "-");
+                }
+
+                // 주간 하교 시간표 UI
+                html += `<div class="summary-box">
+            <div class="summary-title">🗓️ 주간 하교 시간표</div>
+            <table class="leave-table">
+                <tr><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+                <tr>${weekLeaves.map((t, i) => `<td class="${(i + 1) === todayDay ? 'today-mark' : ''}">${t}</td>`).join('')}</tr>
+            </table>
         </div>`;
-        document.getElementById('displayArea').innerHTML = html;
-    } catch { document.getElementById('displayArea').innerText = "시간표 정보가 없습니다."; }
-}
 
-async function getSched(sch) {
-    try {
-        let now = new Date();
-        let start = formatDate(new Date(now.getFullYear(), 0, 1));
-        let end = formatDate(new Date(now.getFullYear() + 1, 2, 31));
-        
-        const data = await fetchFromWorker("/sched", {
-            code: sch.code,
-            start: start,
-            end: end
-        });
-        
-        let rows = data.SchoolSchedule[1].row;
-        let today = formatDate(new Date());
-        let processed = []; let seen = new Set();
-        const nameMap = { "지필평가1차": "1차 정기시험(중2,3)", "지필평가2차": "2차 정기시험(중2,3)" };
+                // 오늘 학원 정보
+                if (todayDay >= 1 && todayDay <= 5 && currentChild === 'SCHOOL1') {
+                    if (ACADEMIES[todayDay]) {
+                        ACADEMIES[todayDay].forEach(a => {
+                            html += `<div class="aca-card"><div style="flex:1"><b>${a.n}</b><br><small>수업: ${a.t}</small></div><div style="text-align:right"><span style="color:#e91e63;font-size:11px;font-weight:bold">🚌 버스</span><br><b style="color:#e91e63;font-size:1.2rem">${a.b}</b></div></div>`;
+                        });
+                    }
+                    html += `<button class="weekly-btn" onclick="openWeeklyModal()">🗓️ 학원 주간표 전체보기</button>`;
+                }
+                document.getElementById('displayArea').innerHTML = html;
+            } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
+        }
 
-        rows.forEach(r => {
-            if (r.EVENT_NM === "토요휴업일" || r.EVENT_NM === "일요일") return;
-            let key = r.AA_YMD + r.EVENT_NM;
-            if (seen.has(key)) return;
-            seen.add(key);
-            let eventName = nameMap[r.EVENT_NM] || r.EVENT_NM;
-            let last = processed.filter(e => e.name === eventName).pop();
-            if (last) {
-                let ld = new Date(last.end.substring(0,4), last.end.substring(4,6)-1, last.end.substring(6,8));
-                let cd = new Date(r.AA_YMD.substring(0,4), r.AA_YMD.substring(4,6)-1, r.AA_YMD.substring(6,8));
-                let diff = (cd - ld) / 86400000;
-                if (diff >= 1 && diff <= 3) { last.end = r.AA_YMD; return; }
+        async function getSched(sch) {
+            try {
+                let now = new Date();
+                let start = formatDate(new Date(now.getFullYear(), 0, 1)), end = formatDate(new Date(now.getFullYear() + 1, 2, 31));
+                let res = await fetch(`https://open.neis.go.kr/hub/SchoolSchedule?KEY=${KEY}&Type=json&pSize=500&ATPT_OFCDC_SC_CODE=${EDU}&SD_SCHUL_CODE=${sch.code}&AA_FROM_YMD=${start}&AA_TO_YMD=${end}`);
+                let data = await res.json();
+                let rows = data.SchoolSchedule[1].row, today = formatDate(new Date()), monthly = {};
+                rows.forEach(r => {
+                    if (r.EVENT_NM === "토요휴업일" || r.EVENT_NM === "일요일") return;
+                    let m = r.AA_YMD.substring(0, 4) + "년 " + parseInt(r.AA_YMD.substring(4, 6)) + "월";
+                    if (!monthly[m]) monthly[m] = [];
+                    monthly[m].push(r);
+                });
+                let html = "";
+                for (let m in monthly) {
+                    html += `<div style="color:var(--current-theme);border-bottom:2px solid var(--current-theme);display:inline-block;padding:2px 10px;margin-top:20px;font-weight:800;text-align:left">${m}</div><table style="margin-top:10px;border:none">`;
+                    monthly[m].forEach(r => {
+                        let isPast = r.AA_YMD < today;
+                        html += `<tr style="border:none"><td style="width:110px;border:none;text-align:left;font-size:0.85rem" class="${isPast ? 'strikethrough' : ''}">${displayDate(r.AA_YMD)}</td><td style="text-align:left;font-weight:bold;border:none" class="${isPast ? 'strikethrough' : ''}">${r.EVENT_NM}</td></tr>`;
+                    });
+                    html += "</table>";
+                }
+                document.getElementById('displayArea').innerHTML = html;
+            } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
+        }
+
+        function formatDate(d) { return d.getFullYear() + (d.getMonth() + 1).toString().padStart(2, "0") + d.getDate().toString().padStart(2, "0"); }
+        function displayDate(date) {
+            let y = date.substring(0, 4), m = date.substring(4, 6), d = date.substring(6, 8);
+            let day = new Date(y, m - 1, d).getDay();
+            return `${m}.${d}(${["일", "월", "화", "수", "목", "금", "토"][day]})`;
+        }
+        function openWeeklyModal() {
+            let listHtml = ""; const days = ["", "월요일", "화요일", "수요일", "목요일", "금요일"];
+            for (let d = 1; d <= 5; d++) {
+                listHtml += `<div style="margin-bottom:12px; border-bottom:1px dashed #eee; padding-bottom:8px; text-align:left;">
+            <span style="display:inline-block; padding:2px 8px; background:var(--current-theme); color:white; border-radius:5px; font-size:0.8rem; margin-bottom:5px;">${days[d]}</span>`;
+                if (ACADEMIES[d]) {
+                    ACADEMIES[d].forEach(a => { listHtml += `<div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:3px;"><span><b>${a.n}</b> (${a.t})</span><span style="color:#e91e63; font-weight:bold;">🚌 ${a.b}</span></div>`; });
+                } else { listHtml += `<div style="color:#ccc; font-size:0.8rem;">학원 없음</div>`; }
+                listHtml += `</div>`;
             }
-            processed.push({ name: eventName, start: r.AA_YMD, end: r.AA_YMD });
-        });
-
-        if (sch.code === "7751314") {
-            let exam = processed.find(e => e.name.includes("1차 정기시험"));
-            if (exam && exam.start === "20260427") { exam.end = "20260429"; }
+            document.getElementById('weeklyList').innerHTML = listHtml;
+            document.getElementById('weeklyModal').style.display = 'flex';
         }
+        function closeWeeklyModal() { document.getElementById('weeklyModal').style.display = 'none'; }
 
-        let monthly = {};
-        processed.sort((a,b)=>a.start.localeCompare(b.start)).forEach(e => {
-            let m = e.start.substring(0,4) + "년 " + parseInt(e.start.substring(4,6)) + "월";
-            if(!monthly[m]) monthly[m] = [];
-            monthly[m].push(e);
-        });
-
-        let html = "";
-        for(let m in monthly) {
-            html += `<div class="month-bar">${m}</div><table style="margin-top:10px; border:none;">`;
-            monthly[m].forEach(e => {
-                let isPast = e.end < today;
-                let dateText = e.start === e.end ? displayDate(e.start) : `${displayDate(e.start)} ~ ${displayDate(e.end)}`;
-                html += `<tr style="border:none;"><td style="width:165px; border:none; text-align:left; font-size:0.85rem;" class="${isPast?'strikethrough':''}">${dateText}</td>
-                         <td class="${isPast?'strikethrough':''}" style="text-align:left; font-weight:bold; border:none;">${e.name}</td></tr>`;
-            });
-            html += "</table>";
-        }
-        document.getElementById('displayArea').innerHTML = html;
-    } catch { document.getElementById('displayArea').innerText = "일정 정보가 없습니다."; }
-}
-
-switchChild('SCHOOL1');
-</script>
+        init();
+    </script>
 </body>
+
 </html>
