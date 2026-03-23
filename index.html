@@ -378,7 +378,12 @@
                 let html = "";
                 data.mealServiceDietInfo[1].row.forEach(r => {
                     let isToday = r.MLSV_YMD === today;
-                    let cleanMenu = r.DDISH_NM.replace(/<br\/>/g, "<br>").replace(/\([0-9\.]+\)/g, "").trim();
+                    let cleanMenu = r.DDISH_NM
+                        .replace(/<br\/>/g, "<br>")      // 줄바꿈 처리
+                        .replace(/\([0-9\.]+\)/g, "")    // 알레르기 번호 (1.2.3.) 제거
+                        .replace(/\bp\b/gi, "")           // 단어 단위의 p 제거 (대소문자 구분 없음)
+                        .replace(/^p| p/gi, "")          // 문장 시작이나 공백 뒤의 p 제거
+                        .trim();                         // 앞뒤 공백 제거
                     html += `<div class="meal-item" style="padding:15px; border:1px solid #f0f0f0; border-radius:15px; margin-bottom:15px; text-align:left; ${isToday ? 'border:2px solid #FFCC00;background:#FFFDF5' : ''}">
                 <div style="font-weight:bold; color:var(--current-theme); margin-bottom:8px;">${displayDate(r.MLSV_YMD)} ${isToday ? '<span style="background:#FFCC00;padding:2px 5px;border-radius:4px;font-size:11px;color:#333">오늘</span>' : ''}</div>
                 <div style="line-height:1.7">${cleanMenu}</div>
