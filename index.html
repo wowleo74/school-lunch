@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>학교알리미 v2.3</title>
+    <title>학교알리미 v2.9</title>
     <style>
         :root {
             --sieun-color: #FF85A1;
@@ -118,9 +118,9 @@
             color: var(--current-theme);
             border-left: 5px solid var(--current-theme);
             padding-left: 12px;
+            text-align: left;
         }
 
-        /* 시간표 및 하교 시간표 스타일 */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -136,7 +136,7 @@
         }
 
         td {
-            padding: 10px;
+            padding: 12px 8px;
             border: 1px solid #eee;
             text-align: center;
             font-size: 0.9rem;
@@ -190,7 +190,6 @@
             border-radius: 8px;
         }
 
-        /* 학원 카드 */
         .aca-card {
             display: flex;
             align-items: center;
@@ -214,7 +213,6 @@
             cursor: pointer;
         }
 
-        /* 모달 공통 */
         #settingsOverlay,
         #weeklyModal {
             display: none;
@@ -243,6 +241,15 @@
             color: #ccc;
             text-decoration: line-through;
         }
+
+        .month-cell {
+            background: #f8f9ff;
+            font-weight: bold;
+            color: var(--current-theme);
+            border: 1px solid #eee;
+            width: 50px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -251,8 +258,8 @@
     <div class="header-section">
         <div class="main-title">🏠 학교알리미 <span class="settings-btn" onclick="toggleSettings()">⚙️</span></div>
         <div class="child-tabs">
-            <div id="tab1" class="child-tab active sieun" onclick="switchChild('SCHOOL1')">시은 (5-1)</div>
-            <div id="tab2" class="child-tab gaeun" onclick="switchChild('SCHOOL2')">가은 (2-4)</div>
+            <div id="tab1" class="child-tab active sieun" onclick="switchChild('SCHOOL1')">시은</div>
+            <div id="tab2" class="child-tab gaeun" onclick="switchChild('SCHOOL2')">가은</div>
         </div>
         <div class="menu-tabs">
             <button class="menu-btn active" id="btnMeal" onclick="loadContent('meal')">🍱 급식</button>
@@ -305,7 +312,6 @@
             SCHOOL2: { name: "신봉중학교", child: "가은", code: "7751314", type: "misTimetable", grade: 2, class: 4, color: "#4AA3FF" }
         };
 
-        // 이미지에 기반한 시은이 학원 정보
         const ACADEMIES = {
             1: [{ n: "파인만", b: "3:40", t: "4:00~7:00" }],
             2: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "닥터정", b: "4:48", t: "5:00~7:00" }],
@@ -317,7 +323,7 @@
         let currentChild = 'SCHOOL1', currentMenu = 'meal';
 
         function init() {
-            const saved = localStorage.getItem('school_v2_3');
+            const saved = localStorage.getItem('school_final_v4');
             if (saved) {
                 const p = JSON.parse(saved);
                 SCHOOLS.SCHOOL1.grade = p.s_g; SCHOOLS.SCHOOL1.class = p.s_c;
@@ -345,7 +351,7 @@
 
         function saveSettings() {
             const data = { s_g: document.getElementById('s_g').value, s_c: document.getElementById('s_c').value, g_g: document.getElementById('g_g').value, g_c: document.getElementById('g_c').value };
-            localStorage.setItem('school_v2_3', JSON.stringify(data));
+            localStorage.setItem('school_final_v4', JSON.stringify(data));
             location.reload();
         }
 
@@ -368,6 +374,13 @@
             else if (menu === 'sched') getSched(sch);
         }
 
+        function formatDate(d) { return d.getFullYear() + (d.getMonth() + 1).toString().padStart(2, "0") + d.getDate().toString().padStart(2, "0"); }
+        function displayDateShort(date) {
+            let m = date.substring(4, 6), d = date.substring(6, 8);
+            let day = new Date(date.substring(0, 4), parseInt(m) - 1, d).getDay();
+            return `${m}.${d} (${["일", "월", "화", "수", "목", "금", "토"][day]})`;
+        }
+
         async function getMeal(sch) {
             let d = new Date(), today = formatDate(d);
             let mon = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)));
@@ -378,18 +391,13 @@
                 let html = "";
                 data.mealServiceDietInfo[1].row.forEach(r => {
                     let isToday = r.MLSV_YMD === today;
-                    let cleanMenu = r.DDISH_NM
-                        .replace(/<br\/>/g, "<br>")      // 줄바꿈 처리
-                        .replace(/\([0-9\.]+\)/g, "")    // 알레르기 번호 (1.2.3.) 제거
-                        .replace(/\bp\b/gi, "")           // 단어 단위의 p 제거 (대소문자 구분 없음)
-                        .replace(/^p| p/gi, "")          // 문장 시작이나 공백 뒤의 p 제거
-                        .trim();                         // 앞뒤 공백 제거
+                    let cleanMenu = r.DDISH_NM.replace(/<br\/>/g, "<br>").replace(/\([0-9\.]+\)/g, "").replace(/\bp\b/gi, "").trim();
                     html += `<div class="meal-item" style="padding:15px; border:1px solid #f0f0f0; border-radius:15px; margin-bottom:15px; text-align:left; ${isToday ? 'border:2px solid #FFCC00;background:#FFFDF5' : ''}">
-                <div style="font-weight:bold; color:var(--current-theme); margin-bottom:8px;">${displayDate(r.MLSV_YMD)} ${isToday ? '<span style="background:#FFCC00;padding:2px 5px;border-radius:4px;font-size:11px;color:#333">오늘</span>' : ''}</div>
+                <div style="font-weight:bold; color:var(--current-theme); margin-bottom:8px;">${displayDateShort(r.MLSV_YMD)} ${isToday ? '<span style="background:#FFCC00;padding:2px 5px;border-radius:4px;font-size:11px;color:#333">오늘</span>' : ''}</div>
                 <div style="line-height:1.7">${cleanMenu}</div>
             </div>`;
                 });
-                document.getElementById('displayArea').innerHTML = html;
+                document.getElementById('displayArea').innerHTML = html || "급식 데이터가 없습니다.";
             } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
         }
 
@@ -400,12 +408,10 @@
                 let rows = data[sch.type][1].row;
                 let todayDay = new Date().getDay(), table = {};
                 rows.forEach(r => {
-                    let d = new Date(r.ALL_TI_YMD.substring(0, 4), r.ALL_TI_YMD.substring(4, 6) - 1, r.ALL_TI_YMD.substring(6, 8)).getDay();
+                    let d = new Date(r.ALL_TI_YMD.substring(0, 4), parseInt(r.ALL_TI_YMD.substring(4, 6)) - 1, r.ALL_TI_YMD.substring(6, 8)).getDay();
                     if (!table[r.PERIO]) table[r.PERIO] = {};
-                    table[r.PERIO][d] = r.ITRT_CNTNT;
+                    table[r.PERIO][d] = r.ITRT_CONTENT || r.ITRT_CNTNT;
                 });
-
-                // 시간표 출력 (초등 7교시 제외)
                 let html = "<table><tr><th></th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>";
                 let maxP = (sch.type === "elsTimetable") ? 6 : 7;
                 for (let p = 1; p <= maxP; p++) {
@@ -414,30 +420,16 @@
                     html += "</tr>";
                 }
                 html += "</table>";
-
-                // 주간 하교 시간 계산
                 let weekLeaves = [];
                 for (let d = 1; d <= 5; d++) {
                     let dMax = 0; for (let p = 1; p <= maxP; p++) { if (table[p]?.[d]) dMax = p; }
                     let t = (sch.type === "elsTimetable") ? ["", "09:40", "10:30", "11:20", "12:10", "13:50", "14:40"][dMax] : ["", "09:45", "10:40", "11:35", "12:30", "14:20", "15:15", "16:10"][dMax];
                     weekLeaves.push(t || "-");
                 }
-
-                // 주간 하교 시간표 UI
-                html += `<div class="summary-box">
-            <div class="summary-title">🗓️ 주간 하교 시간표</div>
-            <table class="leave-table">
-                <tr><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
-                <tr>${weekLeaves.map((t, i) => `<td class="${(i + 1) === todayDay ? 'today-mark' : ''}">${t}</td>`).join('')}</tr>
-            </table>
-        </div>`;
-
-                // 오늘 학원 정보
+                html += `<div class="summary-box"><div class="summary-title">🗓️ 주간 하교 시간표</div><table class="leave-table"><tr><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr><tr>${weekLeaves.map((t, i) => `<td class="${(i + 1) === todayDay ? 'today-mark' : ''}">${t}</td>`).join('')}</tr></table></div>`;
                 if (todayDay >= 1 && todayDay <= 5 && currentChild === 'SCHOOL1') {
                     if (ACADEMIES[todayDay]) {
-                        ACADEMIES[todayDay].forEach(a => {
-                            html += `<div class="aca-card"><div style="flex:1"><b>${a.n}</b><br><small>수업: ${a.t}</small></div><div style="text-align:right"><span style="color:#e91e63;font-size:11px;font-weight:bold">🚌 버스</span><br><b style="color:#e91e63;font-size:1.2rem">${a.b}</b></div></div>`;
-                        });
+                        ACADEMIES[todayDay].forEach(a => { html += `<div class="aca-card"><div style="flex:1"><b>${a.n}</b><br><small>수업: ${a.t}</small></div><div style="text-align:right"><span style="color:#e91e63;font-size:11px;font-weight:bold">🚌 버스</span><br><b style="color:#e91e63;font-size:1.2rem">${a.b}</b></div></div>`; });
                     }
                     html += `<button class="weekly-btn" onclick="openWeeklyModal()">🗓️ 학원 주간표 전체보기</button>`;
                 }
@@ -451,37 +443,66 @@
                 let start = formatDate(new Date(now.getFullYear(), 0, 1)), end = formatDate(new Date(now.getFullYear() + 1, 2, 31));
                 let res = await fetch(`https://open.neis.go.kr/hub/SchoolSchedule?KEY=${KEY}&Type=json&pSize=500&ATPT_OFCDC_SC_CODE=${EDU}&SD_SCHUL_CODE=${sch.code}&AA_FROM_YMD=${start}&AA_TO_YMD=${end}`);
                 let data = await res.json();
-                let rows = data.SchoolSchedule[1].row, today = formatDate(new Date()), monthly = {};
-                rows.forEach(r => {
-                    if (r.EVENT_NM === "토요휴업일" || r.EVENT_NM === "일요일") return;
-                    let m = r.AA_YMD.substring(0, 4) + "년 " + parseInt(r.AA_YMD.substring(4, 6)) + "월";
-                    if (!monthly[m]) monthly[m] = [];
-                    monthly[m].push(r);
-                });
-                let html = "";
-                for (let m in monthly) {
-                    html += `<div style="color:var(--current-theme);border-bottom:2px solid var(--current-theme);display:inline-block;padding:2px 10px;margin-top:20px;font-weight:800;text-align:left">${m}</div><table style="margin-top:10px;border:none">`;
-                    monthly[m].forEach(r => {
-                        let isPast = r.AA_YMD < today;
-                        html += `<tr style="border:none"><td style="width:110px;border:none;text-align:left;font-size:0.85rem" class="${isPast ? 'strikethrough' : ''}">${displayDate(r.AA_YMD)}</td><td style="text-align:left;font-weight:bold;border:none" class="${isPast ? 'strikethrough' : ''}">${r.EVENT_NM}</td></tr>`;
+                if (!data.SchoolSchedule) { document.getElementById('displayArea').innerHTML = "일정 정보가 없습니다."; return; }
+                let rows = data.SchoolSchedule[1].row, today = formatDate(new Date());
+
+                let filtered = rows.filter(r => r.EVENT_NM !== "토요휴업일" && r.EVENT_NM !== "일요일")
+                    .sort((a, b) => a.AA_YMD.localeCompare(b.AA_YMD));
+
+                // [v2.9 지능형 병합 로직]
+                let mergedEvents = [];
+                if (filtered.length > 0) {
+                    let groups = {};
+                    filtered.forEach(row => {
+                        let name = row.EVENT_NM;
+                        let dateStr = row.AA_YMD;
+                        let currentDate = new Date(dateStr.substring(0, 4), parseInt(dateStr.substring(4, 6)) - 1, dateStr.substring(6, 8));
+                        if (!groups[name]) {
+                            groups[name] = [{ start: dateStr, end: dateStr }];
+                        } else {
+                            let lastGroup = groups[name][groups[name].length - 1];
+                            let lastEndDate = new Date(lastGroup.end.substring(0, 4), parseInt(lastGroup.end.substring(4, 6)) - 1, lastGroup.end.substring(6, 8));
+                            let diff = (currentDate - lastEndDate) / 86400000;
+                            if (diff <= 7) { lastGroup.end = dateStr; } // 7일 이내면 병합
+                            else { groups[name].push({ start: dateStr, end: dateStr }); } // 멀면 분리
+                        }
                     });
-                    html += "</table>";
+                    Object.keys(groups).forEach(name => {
+                        groups[name].forEach(range => { mergedEvents.push({ name: name, start: range.start, end: range.end }); });
+                    });
+                    mergedEvents.sort((a, b) => a.start.localeCompare(b.start));
                 }
+
+                let monthly = {};
+                mergedEvents.forEach(ev => {
+                    let m = parseInt(ev.start.substring(4, 6)) + "월";
+                    if (!monthly[m]) monthly[m] = [];
+                    monthly[m].push(ev);
+                });
+
+                let html = `<table style="width:100%; border-collapse:collapse; font-size:0.9rem; text-align:left;">`;
+                for (let m in monthly) {
+                    let events = monthly[m];
+                    events.forEach((ev, idx) => {
+                        let isPast = ev.end < today;
+                        let s = isPast ? 'class="strikethrough"' : '';
+                        html += `<tr>`;
+                        if (idx === 0) html += `<td rowspan="${events.length}" class="month-cell">${m}</td>`;
+                        let dRange = ev.start === ev.end ? displayDateShort(ev.start) : `${displayDateShort(ev.start)} ~ ${displayDateShort(ev.end)}`;
+                        html += `<td style="padding:12px 8px; border:1px solid #eee; color:#666; font-size:0.8rem; width:130px;" ${s}>${dRange}</td>`;
+                        html += `<td style="padding:12px 8px; border:1px solid #eee; font-weight:bold;" ${s}>${ev.name}</td>`;
+                        html += `</tr>`;
+                    });
+                }
+                html += `</table>`;
                 document.getElementById('displayArea').innerHTML = html;
-            } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
+            } catch { document.getElementById('displayArea').innerHTML = "정보 로딩 오류"; }
         }
 
-        function formatDate(d) { return d.getFullYear() + (d.getMonth() + 1).toString().padStart(2, "0") + d.getDate().toString().padStart(2, "0"); }
-        function displayDate(date) {
-            let y = date.substring(0, 4), m = date.substring(4, 6), d = date.substring(6, 8);
-            let day = new Date(y, m - 1, d).getDay();
-            return `${m}.${d}(${["일", "월", "화", "수", "목", "금", "토"][day]})`;
-        }
         function openWeeklyModal() {
             let listHtml = ""; const days = ["", "월요일", "화요일", "수요일", "목요일", "금요일"];
             for (let d = 1; d <= 5; d++) {
-                listHtml += `<div style="margin-bottom:12px; border-bottom:1px dashed #eee; padding-bottom:8px; text-align:left;">
-            <span style="display:inline-block; padding:2px 8px; background:var(--current-theme); color:white; border-radius:5px; font-size:0.8rem; margin-bottom:5px;">${days[d]}</span>`;
+                listHtml += `<div style="margin-bottom:12px; border-bottom:1px dashed #eee; padding-bottom:8px; text-align:left;"><span style="display:inline-block; padding:2px 8px; background:var(--current-theme); color:white; border-radius:5px; font-size:0.8rem; margin-bottom:5px;">${days[d]}</span>`;
                 if (ACADEMIES[d]) {
                     ACADEMIES[d].forEach(a => { listHtml += `<div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:3px;"><span><b>${a.n}</b> (${a.t})</span><span style="color:#e91e63; font-weight:bold;">🚌 ${a.b}</span></div>`; });
                 } else { listHtml += `<div style="color:#ccc; font-size:0.8rem;">학원 없음</div>`; }
@@ -491,7 +512,6 @@
             document.getElementById('weeklyModal').style.display = 'flex';
         }
         function closeWeeklyModal() { document.getElementById('weeklyModal').style.display = 'none'; }
-
         init();
     </script>
 </body>
