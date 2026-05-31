@@ -11,6 +11,7 @@
             --gaeun-color: #4AA3FF;
             --current-theme: #4F6FD6;
             --bg-color: #f0f3f8;
+            --line-color: #ddd;
         }
 
         body {
@@ -131,29 +132,30 @@
             background: #f8faff;
             color: var(--current-theme);
             padding: 10px;
-            border: 1px solid #eee;
+            border: 1px solid var(--line-color);
             font-size: 0.85rem;
         }
 
         td {
             padding: 12px 8px;
-            border: 1px solid #eee;
+            border: 1px solid var(--line-color);
             text-align: center;
             font-size: 0.9rem;
         }
 
         .highlight-cell {
-            background: rgba(79, 111, 214, 0.1);
+            background: color-mix(in srgb, var(--current-theme) 12%, white);
             color: var(--current-theme);
             font-weight: bold;
         }
 
         .summary-box {
             background: #fafafa;
-            border: 1px solid #eee;
+            border: 1px solid var(--line-color);
             border-radius: 15px;
             padding: 15px;
             margin-top: 15px;
+            overflow: hidden;
         }
 
         .summary-title {
@@ -172,7 +174,7 @@
         .leave-table th {
             background: transparent;
             border: none;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--line-color);
             color: #999;
             padding: 5px;
         }
@@ -193,24 +195,121 @@
         .aca-card {
             display: flex;
             align-items: center;
-            background: #f8f9ff;
+            background: color-mix(in srgb, var(--current-theme) 8%, white);
             padding: 15px;
             border-radius: 15px;
             margin-top: 15px;
-            border-left: 5px solid #e91e63;
+            border-left: 5px solid var(--current-theme);
             text-align: left;
         }
 
-        .weekly-btn {
-            width: 100%;
-            margin-top: 15px;
-            padding: 12px;
-            background: white;
-            border: 1.5px solid var(--current-theme);
+        .aca-card .theme-accent {
             color: var(--current-theme);
-            border-radius: 12px;
             font-weight: bold;
-            cursor: pointer;
+        }
+
+        .aca-week-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        .aca-week-table th {
+            width: 2.2rem;
+            padding: 10px 6px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--line-color);
+            color: #999;
+            font-size: 0.85rem;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+
+        .aca-week-table td {
+            vertical-align: middle;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            padding: 10px 8px;
+            border: none;
+            border-bottom: 1px solid var(--line-color);
+            text-align: left;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        .aca-week-table tr:last-child th,
+        .aca-week-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .aca-cell-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .aca-cell-item + .aca-cell-item {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--line-color);
+        }
+
+        .today-mark .aca-cell-item + .aca-cell-item {
+            border-top-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .aca-cell-time {
+            font-weight: normal;
+            color: #666;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
+        .today-mark .aca-cell-time {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .aca-go {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 3px;
+            min-width: 4.6rem;
+            flex-shrink: 0;
+            color: var(--current-theme);
+            font-weight: bold;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .aca-go-icon {
+            display: inline-block;
+            width: 1.15em;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .aca-go-text {
+            text-align: right;
+            min-width: 2.85rem;
+        }
+
+        .today-mark .aca-go {
+            color: white;
+        }
+
+        .aca-empty {
+            color: #ccc;
+            font-size: 0.75rem;
+        }
+
+        .today-mark .aca-empty {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         #settingsOverlay,
@@ -246,7 +345,7 @@
             background: #f8f9ff;
             font-weight: bold;
             color: var(--current-theme);
-            border: 1px solid #eee;
+            border: 1px solid var(--line-color);
             width: 50px;
             text-align: center;
         }
@@ -262,8 +361,8 @@
             <div id="tab2" class="child-tab gaeun" onclick="switchChild('SCHOOL2')">가은</div>
         </div>
         <div class="menu-tabs">
-            <button class="menu-btn active" id="btnMeal" onclick="loadContent('meal')">🍱 급식</button>
-            <button class="menu-btn" id="btnTime" onclick="loadContent('time')">📚 시간표</button>
+            <button class="menu-btn active" id="btnTime" onclick="loadContent('time')">📚 시간표</button>
+            <button class="menu-btn" id="btnMeal" onclick="loadContent('meal')">🍱 급식</button>
             <button class="menu-btn" id="btnSched" onclick="loadContent('sched')">🗓️ 일정</button>
         </div>
     </div>
@@ -313,14 +412,14 @@
         };
 
         const ACADEMIES = {
-            1: [{ n: "파인만", b: "3:40", t: "4:00~7:00" }],
-            2: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "닥터정", b: "4:48", t: "5:00~7:00" }],
-            3: [{ n: "태권도", b: "1:40", t: "2:10~3:00" }, { n: "파인만", b: "3:40", t: "4:00~7:00" }],
-            4: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "닥터정", b: "4:48", t: "5:00~7:00" }],
-            5: [{ n: "파인만", b: "3:40", t: "4:00~7:00" }]
+            1: [{ n: "닥터정", b: "4:47", t: "5:00~7:00" }],
+            2: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "세이노", t: "4:00~7:00", walk: true }],
+            3: [{ n: "태권도", b: "1:40", t: "2:10~3:00" }, { n: "닥터정", b: "4:47", t: "5:00~7:00" }],
+            4: [{ n: "태권도", b: "3:20", t: "3:30~4:20" }, { n: "세이노", t: "4:00~7:00", walk: true }],
+            5: [{ n: "닥터정", b: "4:47", t: "5:00~7:00" }]
         };
 
-        let currentChild = 'SCHOOL1', currentMenu = 'meal';
+        let currentChild = 'SCHOOL1', currentMenu = 'time';
 
         function init() {
             const saved = localStorage.getItem('school_final_v4');
@@ -401,6 +500,12 @@
             } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
         }
 
+        function formatSubjectName(name) {
+            if (!name) return "";
+            if (/자율[\s·]*자치/.test(name)) return "자율";
+            return name;
+        }
+
         async function getTime(sch) {
             try {
                 let res = await fetch(`https://open.neis.go.kr/hub/${sch.type}?KEY=${KEY}&Type=json&pSize=100&ATPT_OFCDC_SC_CODE=${EDU}&SD_SCHUL_CODE=${sch.code}&AY=2026&SEM=1&GRADE=${sch.grade}&CLASS_NM=${sch.class}`);
@@ -410,7 +515,7 @@
                 rows.forEach(r => {
                     let d = new Date(r.ALL_TI_YMD.substring(0, 4), parseInt(r.ALL_TI_YMD.substring(4, 6)) - 1, r.ALL_TI_YMD.substring(6, 8)).getDay();
                     if (!table[r.PERIO]) table[r.PERIO] = {};
-                    table[r.PERIO][d] = r.ITRT_CONTENT || r.ITRT_CNTNT;
+                    table[r.PERIO][d] = formatSubjectName(r.ITRT_CONTENT || r.ITRT_CNTNT);
                 });
                 let html = "<table><tr><th></th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>";
                 let maxP = (sch.type === "elsTimetable") ? 6 : 7;
@@ -427,11 +532,11 @@
                     weekLeaves.push(t || "-");
                 }
                 html += `<div class="summary-box"><div class="summary-title">🗓️ 주간 하교 시간표</div><table class="leave-table"><tr><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr><tr>${weekLeaves.map((t, i) => `<td class="${(i + 1) === todayDay ? 'today-mark' : ''}">${t}</td>`).join('')}</tr></table></div>`;
-                if (todayDay >= 1 && todayDay <= 5 && currentChild === 'SCHOOL1') {
-                    if (ACADEMIES[todayDay]) {
-                        ACADEMIES[todayDay].forEach(a => { html += `<div class="aca-card"><div style="flex:1"><b>${a.n}</b><br><small>수업: ${a.t}</small></div><div style="text-align:right"><span style="color:#e91e63;font-size:11px;font-weight:bold">🚌 버스</span><br><b style="color:#e91e63;font-size:1.2rem">${a.b}</b></div></div>`; });
+                if (currentChild === 'SCHOOL1') {
+                    if (todayDay >= 1 && todayDay <= 5 && ACADEMIES[todayDay]) {
+                        ACADEMIES[todayDay].forEach(a => { html += renderAcaTodayCard(a); });
                     }
-                    html += `<button class="weekly-btn" onclick="openWeeklyModal()">🗓️ 학원 주간표 전체보기</button>`;
+                    html += renderAcademyWeeklyHtml(todayDay >= 1 && todayDay <= 5 ? todayDay : 0);
                 }
                 document.getElementById('displayArea').innerHTML = html;
             } catch { document.getElementById('displayArea').innerHTML = "정보가 없습니다."; }
@@ -489,8 +594,8 @@
                         html += `<tr>`;
                         if (idx === 0) html += `<td rowspan="${events.length}" class="month-cell">${m}</td>`;
                         let dRange = ev.start === ev.end ? displayDateShort(ev.start) : `${displayDateShort(ev.start)} ~ ${displayDateShort(ev.end)}`;
-                        html += `<td style="padding:12px 8px; border:1px solid #eee; color:#666; font-size:0.8rem; width:130px;" ${s}>${dRange}</td>`;
-                        html += `<td style="padding:12px 8px; border:1px solid #eee; font-weight:bold;" ${s}>${ev.name}</td>`;
+                        html += `<td style="padding:12px 8px; border:1px solid var(--line-color); color:#666; font-size:0.8rem; width:130px;" ${s}>${dRange}</td>`;
+                        html += `<td style="padding:12px 8px; border:1px solid var(--line-color); font-weight:bold;" ${s}>${ev.name}</td>`;
                         html += `</tr>`;
                     });
                 }
@@ -499,16 +604,38 @@
             } catch { document.getElementById('displayArea').innerHTML = "정보 로딩 오류"; }
         }
 
-        function openWeeklyModal() {
-            let listHtml = ""; const days = ["", "월요일", "화요일", "수요일", "목요일", "금요일"];
+        function formatAcaGo(a) {
+            if (a.walk) return `<span class="aca-go"><span class="aca-go-icon">🚶</span><span class="aca-go-text">걸어서</span></span>`;
+            return `<span class="aca-go"><span class="aca-go-icon">🚌</span><span class="aca-go-text">${a.b}</span></span>`;
+        }
+
+        function renderAcaTodayCard(a) {
+            const go = a.walk
+                ? `<span class="theme-accent" style="font-size:11px">🚶 이동</span><br><b class="theme-accent" style="font-size:1rem">걸어서</b>`
+                : `<span class="theme-accent" style="font-size:11px">🚌 버스</span><br><b class="theme-accent" style="font-size:1.2rem">${a.b}</b>`;
+            return `<div class="aca-card"><div style="flex:1"><b>${a.n}</b><span class="aca-cell-time">${a.t}</span></div><div style="text-align:right">${go}</div></div>`;
+        }
+
+        function renderAcademyCell(day) {
+            if (!ACADEMIES[day]) return `<span class="aca-empty">-</span>`;
+            return ACADEMIES[day].map(a =>
+                `<div class="aca-cell-item"><span><b>${a.n}</b><span class="aca-cell-time">${a.t}</span></span>${formatAcaGo(a)}</div>`
+            ).join("");
+        }
+
+        function renderAcademyWeeklyHtml(highlightDay) {
+            const days = ["", "월", "화", "수", "목", "금"];
+            let html = `<div class="summary-box"><div class="summary-title">📚 주간 학원 시간표</div><table class="aca-week-table">`;
             for (let d = 1; d <= 5; d++) {
-                listHtml += `<div style="margin-bottom:12px; border-bottom:1px dashed #eee; padding-bottom:8px; text-align:left;"><span style="display:inline-block; padding:2px 8px; background:var(--current-theme); color:white; border-radius:5px; font-size:0.8rem; margin-bottom:5px;">${days[d]}</span>`;
-                if (ACADEMIES[d]) {
-                    ACADEMIES[d].forEach(a => { listHtml += `<div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:3px;"><span><b>${a.n}</b> (${a.t})</span><span style="color:#e91e63; font-weight:bold;">🚌 ${a.b}</span></div>`; });
-                } else { listHtml += `<div style="color:#ccc; font-size:0.8rem;">학원 없음</div>`; }
-                listHtml += `</div>`;
+                const isToday = highlightDay > 0 && d === highlightDay;
+                html += `<tr><th>${days[d]}</th><td class="${isToday ? 'today-mark' : ''}">${renderAcademyCell(d)}</td></tr>`;
             }
-            document.getElementById('weeklyList').innerHTML = listHtml;
+            html += `</table></div>`;
+            return html;
+        }
+
+        function openWeeklyModal() {
+            document.getElementById('weeklyList').innerHTML = renderAcademyWeeklyHtml(new Date().getDay()).replace(/class="summary-box"/, 'class=""');
             document.getElementById('weeklyModal').style.display = 'flex';
         }
         function closeWeeklyModal() { document.getElementById('weeklyModal').style.display = 'none'; }
